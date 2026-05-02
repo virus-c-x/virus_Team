@@ -1,0 +1,61 @@
+{
+  "entities": {
+    "Order": {
+      "title": "Order",
+      "description": "Customer order data",
+      "type": "object",
+      "properties": {
+        "fullName": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "projectName": { "type": "string" },
+        "projectDescription": { "type": "string" },
+        "budget": { "type": "string" },
+        "age": { "type": "string" },
+        "city": { "type": "string" },
+        "message": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "in progress", "done"] },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "plan": { "type": "string" }
+      },
+      "required": ["fullName", "email", "status", "timestamp"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Template or digital product",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "price": { "type": "string" },
+        "category": { "type": "string" },
+        "image": { "type": "string" },
+        "liveDemo": { "type": "string" }
+      }
+    },
+    "SiteContent": {
+      "title": "Site Content",
+      "description": "Editable website sections",
+      "type": "object",
+      "properties": {
+        "heroTitle": { "type": "string" },
+        "heroSubtitle": { "type": "string" },
+        "aboutText": { "type": "string" }
+      }
+    }
+  },
+  "firestore": {
+    "/orders/{orderId}": {
+      "schema": "Order",
+      "description": "Collection of customer orders"
+    },
+    "/products/{productId}": {
+      "schema": "Product",
+      "description": "Collection of available products/templates"
+    },
+    "/siteContent/{contentId}": {
+      "schema": "SiteContent",
+      "description": "Dynamic website content storage"
+    }
+  }
+}

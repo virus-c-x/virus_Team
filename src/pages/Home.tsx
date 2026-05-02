@@ -1,7 +1,9 @@
 import { motion } from 'motion/react';
-import { ArrowRight, CheckCircle2, Zap, Rocket, Shield, Palette } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Zap, Rocket, Shield, Palette, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import BackgroundParticles from '../components/BackgroundParticles';
+import { useState, useEffect } from 'react';
+import { siteService } from '../lib/firestoreService';
 
 const fadeIn = {
   initial: { opacity: 0, y: 20 },
@@ -11,6 +13,18 @@ const fadeIn = {
 };
 
 export default function Home() {
+  const [content, setContent] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    siteService.getContent().then(c => {
+      if (c) setContent(c);
+      setLoading(false);
+    });
+  }, []);
+
+  if (loading) return <div className="h-screen flex items-center justify-center"><RefreshCw className="animate-spin text-brand-purple" size={48} /></div>;
+
   return (
     <div className="flex flex-col gap-32 pb-32">
       {/* Hero Section */}
@@ -32,10 +46,9 @@ export default function Home() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-6xl md:text-8xl font-display font-extrabold leading-[1.05] tracking-tight"
+              className="text-5xl md:text-7xl font-display font-extrabold leading-[1.05] tracking-tight"
             >
-              Crafting the <br/>
-              <span className="text-gradient">Digital Future.</span>
+              {content?.heroTitle || 'Crafting the Digital Future.'}
             </motion.h1>
 
             <motion.p
@@ -44,7 +57,7 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.4 }}
               className="text-lg text-gray-400 max-w-md leading-relaxed"
             >
-              High-end bespoke websites for visionary brands. We combine futuristic design with cutting-edge tech to create immersive digital experiences.
+              {content?.heroSubtitle || 'High-end bespoke websites for visionary brands. We combine futuristic design with cutting-edge tech to create immersive digital experiences.'}
             </motion.p>
 
             <motion.div
@@ -53,10 +66,11 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.6 }}
               className="flex flex-wrap gap-4"
             >
-              <Link to="/portfolio" className="px-8 py-4 bg-white text-black font-bold rounded-xl hover:bg-gray-200 transition-all">
+              <Link to="/portfolio" className="btn-primary">
                 View Work 
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </Link>
-              <Link to="/templates" className="px-8 py-4 bg-white/5 border border-white/10 text-white font-bold rounded-xl hover:bg-white/10 transition-all text-center">
+              <Link to="/templates" className="btn-secondary">
                 Explore Templates
               </Link>
             </motion.div>
@@ -101,7 +115,12 @@ export default function Home() {
 
       {/* Stats Section */}
       <section className="px-6">
-        <div className="max-w-7xl mx-auto glass-panel p-12 rounded-[2rem] grid grid-cols-2 md:grid-cols-4 gap-8">
+        <motion.div 
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="max-w-7xl mx-auto glass-panel p-12 rounded-[2rem] grid grid-cols-2 md:grid-cols-4 gap-8"
+        >
           {[
             { label: 'Happy Clients', value: '150+' },
             { label: 'Projects Done', value: '420+' },
@@ -110,7 +129,9 @@ export default function Home() {
           ].map((stat, i) => (
             <motion.div 
               key={i}
-              {...fadeIn}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
               className="text-center md:text-left flex flex-col gap-1"
             >
@@ -118,7 +139,7 @@ export default function Home() {
               <span className="text-sm text-white/40 uppercase tracking-widest">{stat.label}</span>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
       </section>
 
       {/* Benefits Section */}
@@ -209,7 +230,7 @@ export default function Home() {
           <h2 className="text-4xl md:text-6xl font-display font-bold leading-tight z-10">Ready to build the future?</h2>
           <p className="text-white/80 max-w-xl text-lg z-10">Limited availability for exclusive projects. Secured your spot today for a Q3 launch.</p>
           <div className="flex gap-4 z-10">
-            <Link to="/pricing" className="bg-white text-brand-bg px-10 py-4 rounded-full font-bold hover:scale-105 active:scale-95 transition-all">Start Your Project</Link>
+            <Link to="/pricing" className="btn-primary !px-12 !py-5 text-lg">Start Your Project</Link>
           </div>
         </motion.div>
       </section>

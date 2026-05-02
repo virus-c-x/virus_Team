@@ -1,58 +1,36 @@
 import { motion } from 'motion/react';
-import { ExternalLink, ShoppingCart, Filter } from 'lucide-react';
-
-const templates = [
-  {
-    id: 1,
-    title: 'Aura Fintech',
-    category: 'SaaS',
-    image: 'https://images.unsplash.com/photo-1551288049-d8d21a24d864?q=80&w=2400&auto=format&fit=crop',
-    description: 'Ultra-clean, data-centric interface for the next generation of finance.',
-    price: '$499'
-  },
-  {
-    id: 2,
-    title: 'Ether Studio',
-    category: 'Agency',
-    image: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=2400&auto=format&fit=crop',
-    description: 'A brutalist, high-impact portfolio template for creative revolutionaries.',
-    price: '$399'
-  },
-  {
-    id: 3,
-    title: 'Nexus Ecom',
-    category: 'Store',
-    image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=2400&auto=format&fit=crop',
-    description: 'Highly modular e-commerce engine optimized for conversion speed.',
-    price: '$599'
-  },
-  {
-    id: 4,
-    title: 'Nova AI',
-    category: 'Tech',
-    image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2400&auto=format&fit=crop',
-    description: 'Dynamic storytelling template designed for AI startups and research.',
-    price: '$449'
-  },
-  {
-    id: 5,
-    title: 'Vibe Travel',
-    category: 'Lifestyle',
-    image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=2400&auto=format&fit=crop',
-    description: 'Immersive Concierge theme with smooth parallax and rich media galleries.',
-    price: '$349'
-  },
-  {
-    id: 6,
-    title: 'Zen Health',
-    category: 'Wellness',
-    image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=2400&auto=format&fit=crop',
-    description: 'Soothing organic design for wellness brands and boutique studios.',
-    price: '$299'
-  }
-];
+import { ExternalLink, ShoppingCart, Filter, RefreshCw } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { productService } from '../lib/firestoreService';
 
 export default function Templates() {
+  const [dbTemplates, setDbTemplates] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    productService.getProducts().then(res => {
+      setDbTemplates(res || []);
+      setLoading(false);
+    });
+  }, []);
+
+  const staticTemplates = [
+    {
+      id: 1,
+      title: 'Aura Fintech',
+      category: 'SaaS',
+      image: 'https://images.unsplash.com/photo-1551288049-d8d21a24d864?q=80&w=2400&auto=format&fit=crop',
+      description: 'Ultra-clean, data-centric interface for the next generation of finance.',
+      price: '$499'
+    },
+    // ... other static templates
+  ];
+
+  const allTemplates = [...dbTemplates, ...staticTemplates.slice(0, 5)]; // Keep it clean
+
+  if (loading) return <div className="h-screen flex items-center justify-center"><RefreshCw className="animate-spin text-brand-purple" size={48} /></div>;
+
   return (
     <div className="max-w-7xl mx-auto px-6 py-20">
       <div className="flex flex-col md:flex-row justify-between items-end gap-8 mb-20">
@@ -67,9 +45,9 @@ export default function Templates() {
       </div>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {templates.map((template, i) => (
+        {allTemplates.map((template, i) => (
           <motion.div
-            key={template.id}
+            key={template.id || i}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
@@ -95,7 +73,7 @@ export default function Templates() {
                 <span className="text-brand-purple font-display font-bold">{template.price}</span>
               </div>
               <p className="text-white/40 text-sm leading-relaxed mb-4">
-                {template.description}
+                {template.description || 'Premium architecture designed for high-performance conversion and futuristic aesthetics.'}
               </p>
               
               <div className="mt-auto grid grid-cols-2 gap-3">
@@ -103,10 +81,10 @@ export default function Templates() {
                   Live Demo
                   <ExternalLink size={14} className="group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" />
                 </button>
-                <button className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-brand-purple hover:bg-brand-violet transition-all text-xs font-bold uppercase tracking-wider shadow-lg shadow-brand-purple/20">
+                <Link to="/pricing" className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-brand-purple hover:bg-brand-violet transition-all text-xs font-bold uppercase tracking-wider shadow-lg shadow-brand-purple/20 text-white">
                   Buy & Sync
                   <ShoppingCart size={14} />
-                </button>
+                </Link>
               </div>
             </div>
           </motion.div>
@@ -118,13 +96,13 @@ export default function Templates() {
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
-        className="mt-32 p-12 glass-panel rounded-[2.5rem] flex flex-col md:flex-row items-center justify-between gap-8 border-brand-purple/20 bg-brand-purple/5"
+        className="mt-32 p-12 glass-panel rounded-[2.5rem] flex flex-col md:flex-row items-center justify-between gap-8 border-purple-500/20 bg-brand-purple/5"
       >
         <div className="flex flex-col gap-3">
           <h2 className="text-3xl font-display font-bold">Need something bespoke?</h2>
           <p className="text-white/50">Our architects can build a completely unique experience from scratch.</p>
         </div>
-        <button className="btn-primary">Connect with Architects</button>
+        <Link to="/pricing" className="btn-primary min-w-[240px]">Connect with Architects</Link>
       </motion.div>
     </div>
   );

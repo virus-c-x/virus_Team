@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
-import { Check, Zap, Rocket, Star, Info } from 'lucide-react';
-import { useState } from 'react';
+import { Check, Zap, Rocket, Star, Info, Loader2 } from 'lucide-react';
+import { useState, FormEvent } from 'react';
+import { orderService } from '../lib/firestoreService';
 
 const plans = [
   {
@@ -55,10 +56,51 @@ const plans = [
 export default function Pricing() {
   const [showOrderForm, setShowOrderForm] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState('');
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  // Form State
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    phone: '',
+    projectName: '',
+    projectDescription: '',
+    budget: '',
+    age: '',
+    city: '',
+    message: ''
+  });
 
   const handleOrder = (planName: string) => {
     setSelectedPlan(planName);
     setShowOrderForm(true);
+    setIsSuccess(false);
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await orderService.createOrder({
+        ...formData,
+        plan: selectedPlan
+      });
+      setIsSuccess(true);
+      setTimeout(() => {
+        setShowOrderForm(false);
+        setIsSuccess(false);
+        setFormData({
+          fullName: '', email: '', phone: '', projectName: '',
+          projectDescription: '', budget: '', age: '', city: '', message: ''
+        });
+      }, 5000);
+    } catch (err) {
+      console.error(err);
+      alert('Transmission failed. Re-initiating protocol.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -137,49 +179,108 @@ export default function Pricing() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             className="glass-panel p-10 rounded-[2.5rem] max-w-xl w-full relative z-10 neon-glow-purple border-brand-purple/30"
           >
-            <h3 className="text-3xl font-display font-bold mb-2">Initialize Project</h3>
-            <p className="text-white/50 mb-8 flex items-center gap-2 text-sm italic">
-              <Info size={14} className="text-brand-purple" />
-              You've selected the <span className="text-brand-purple font-bold uppercase tracking-widest">{selectedPlan}</span> plan.
-            </p>
-
-            <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); alert('Order details sent to our architects!'); setShowOrderForm(false); }}>
-              <div className="space-y-2">
-                <label className="text-xs font-bold uppercase tracking-widest text-white/40">Full Name</label>
-                <input required type="text" className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 focus:border-brand-purple outline-none transition-all" placeholder="John Wick" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-xs font-bold uppercase tracking-widest text-white/40">Work Email</label>
-                <input required type="email" className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 focus:border-brand-purple outline-none transition-all" placeholder="john@continental.com" />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-white/40">Website Type</label>
-                  <select className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 focus:border-brand-purple outline-none transition-all text-white/50">
-                    <option>SaaS</option>
-                    <option>E-commerce</option>
-                    <option>Portfolio</option>
-                    <option>Other</option>
-                  </select>
+            {isSuccess ? (
+              <div className="py-20 flex flex-col items-center text-center gap-6">
+                <div className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center text-green-500 mb-4">
+                  <Check size={40} />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-white/40">Logo Provided?</label>
-                  <select className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 focus:border-brand-purple outline-none transition-all text-white/50">
-                    <option>Yes, ready</option>
-                    <option>Need design</option>
-                  </select>
-                </div>
+                <h3 className="text-3xl font-display font-bold">Transmission Received</h3>
+                <p className="text-white/50">Our architects have received your request. Expect a frequency match within 24 hours.</p>
               </div>
-              <div className="space-y-2">
-                <label className="text-xs font-bold uppercase tracking-widest text-white/40">Brief Notes</label>
-                <textarea className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 focus:border-brand-purple outline-none transition-all h-24" placeholder="Tell us about your digital dream..."></textarea>
-              </div>
+            ) : (
+              <>
+                <h3 className="text-3xl font-display font-bold mb-2">Initialize Project</h3>
+                <p className="text-white/50 mb-8 flex items-center gap-2 text-sm italic">
+                  <Info size={14} className="text-brand-purple" />
+                  You've selected the <span className="text-brand-purple font-bold uppercase tracking-widest">{selectedPlan}</span> plan.
+                </p>
 
-              <div className="pt-4 flex gap-4">
-                <button type="submit" className="btn-primary flex-grow">Transmit Request</button>
-                <button type="button" onClick={() => setShowOrderForm(false)} className="px-8 py-3 rounded-full font-medium border border-white/10">Abort</button>
-              </div>
-            </form>
+                <form className="space-y-6" onSubmit={handleSubmit}>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold uppercase tracking-widest text-white/40">Full Name</label>
+                      <input 
+                        required 
+                        type="text" 
+                        value={formData.fullName}
+                        onChange={e => setFormData({...formData, fullName: e.target.value})}
+                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 focus:border-brand-purple outline-none transition-all" 
+                        placeholder="John Wick" 
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold uppercase tracking-widest text-white/40">Work Email</label>
+                      <input 
+                        required 
+                        type="email" 
+                        value={formData.email}
+                        onChange={e => setFormData({...formData, email: e.target.value})}
+                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 focus:border-brand-purple outline-none transition-all" 
+                        placeholder="john@continental.com" 
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold uppercase tracking-widest text-white/40">Phone Vector</label>
+                      <input 
+                        required 
+                        type="tel" 
+                        value={formData.phone}
+                        onChange={e => setFormData({...formData, phone: e.target.value})}
+                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 focus:border-brand-purple outline-none transition-all" 
+                        placeholder="+1 (234) 567-890" 
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold uppercase tracking-widest text-white/40">Project Identifier</label>
+                      <input 
+                        required 
+                        type="text" 
+                        value={formData.projectName}
+                        onChange={e => setFormData({...formData, projectName: e.target.value})}
+                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 focus:border-brand-purple outline-none transition-all" 
+                        placeholder="Project Neon" 
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="space-y-2">
+                       <label className="text-xs font-bold uppercase tracking-widest text-white/40">Budget</label>
+                       <input required type="text" value={formData.budget} onChange={e => setFormData({...formData, budget: e.target.value})} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 focus:border-brand-purple outline-none" placeholder="$5k" />
+                    </div>
+                    <div className="space-y-2">
+                       <label className="text-xs font-bold uppercase tracking-widest text-white/40">Age</label>
+                       <input required type="number" value={formData.age} onChange={e => setFormData({...formData, age: e.target.value})} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 focus:border-brand-purple outline-none" placeholder="25" />
+                    </div>
+                    <div className="col-span-2 space-y-2">
+                       <label className="text-xs font-bold uppercase tracking-widest text-white/40">City/Zone</label>
+                       <input required type="text" value={formData.city} onChange={e => setFormData({...formData, city: e.target.value})} className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 focus:border-brand-purple outline-none" placeholder="New York" />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-widest text-white/40">Brief Notes / Context</label>
+                    <textarea 
+                      required
+                      value={formData.message}
+                      onChange={e => setFormData({...formData, message: e.target.value})}
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 focus:border-brand-purple outline-none transition-all h-24" 
+                      placeholder="Tell us about your digital dream..."
+                    ></textarea>
+                  </div>
+
+                  <div className="pt-4 flex gap-4">
+                    <button type="submit" disabled={loading} className="btn-primary flex-grow">
+                      {loading ? <Loader2 className="animate-spin" /> : 'Transmit Request'}
+                    </button>
+                    <button type="button" onClick={() => setShowOrderForm(false)} className="px-8 py-3 rounded-xl font-medium border border-white/10">Abort</button>
+                  </div>
+                </form>
+              </>
+            )}
           </motion.div>
         </div>
       )}

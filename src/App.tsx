@@ -5,6 +5,9 @@ import Templates from './pages/Templates';
 import Portfolio from './pages/Portfolio';
 import Pricing from './pages/Pricing';
 import HowItWorks from './pages/HowItWorks';
+import Login from './pages/Login';
+import Admin from './pages/Admin';
+import ProtectedRoute from './components/ProtectedRoute';
 
 export default function App() {
   return (
@@ -16,6 +19,15 @@ export default function App() {
           <Route path="/portfolio" element={<Portfolio />} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
+          <Route path="/login" element={<Login />} />
+          <Route 
+            path="/admin" 
+            element={
+              <ProtectedRoute>
+                <Admin />
+              </ProtectedRoute>
+            } 
+          />
         </Routes>
       </Layout>
     </Router>

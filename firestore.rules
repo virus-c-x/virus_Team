@@ -1,0 +1,85 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Helpers ---
+    
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      // Admin check: Document exists in 'admins' collection OR specific owner email
+      return isSignedIn() && (
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+        (request.auth.token.email == "crayziman1230e@gmail.com" && request.auth.token.email_verified == true)
+      );
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // --- Collection: Site Content ---
+    match /siteContent/{contentId} {
+      allow read: if true; // Publicly readable for CMS
+      allow write: if isAdmin();
+      
+      function isValidContent(data) {
+        return data.heroTitle is string && data.heroTitle.size() <= 200
+            && data.heroSubtitle is string && data.heroSubtitle.size() <= 1000;
+      }
+    }
+
+    // --- Collection: Products ---
+    match /products/{productId} {
+      allow read: if true; // Publicly readable
+      allow write: if isAdmin();
+
+      function isValidProduct(data) {
+        return data.title is string && data.title.size() <= 100
+            && data.price is string && data.price.size() <= 20;
+      }
+    }
+
+    // --- Collection: Orders ---
+    match /orders/{orderId} {
+      // Only admins can view or list orders
+      allow get, list: if isAdmin();
+      
+      // Anyone can create an order
+      allow create: if isValidOrder(incoming());
+      
+      // Only admin can update status
+      allow update: if isAdmin() 
+        && incoming().diff(existing()).affectedKeys().hasOnly(['status']);
+
+      function isValidOrder(data) {
+        return data.fullName is string && data.fullName.size() <= 100
+            && data.email is string && data.email.size() <= 100
+            && data.projectName is string && data.projectName.size() <= 200
+            && data.status == 'pending'
+            && data.timestamp == request.time;
+      }
+    }
+
+    // --- Collection: Admins (Bootstrap) ---
+    match /admins/{userId} {
+      allow read: if isSignedIn() && request.auth.uid == userId;
+      allow write: if false; // System managed or manual bootstrap
+    }
+  }
+}

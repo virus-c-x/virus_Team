@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import { ExternalLink, Tag } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const projects = [
   {
@@ -87,12 +88,12 @@ export default function Portfolio() {
               </p>
               
               <div className="pt-4">
-                <button className="flex items-center gap-3 text-sm font-bold uppercase tracking-widest text-white group">
+                <Link to="/pricing" className="flex items-center gap-4 text-sm font-bold uppercase tracking-widest text-white group w-fit">
                   Preview Experience
-                  <div className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center group-hover:bg-brand-purple group-hover:border-brand-purple transition-all duration-300">
-                    <ExternalLink size={18} />
+                  <div className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center group-hover:bg-purple-600 group-hover:border-purple-600 group-hover:shadow-[0_0_20px_rgba(168,85,247,0.4)] transition-all duration-300">
+                    <ExternalLink size={20} />
                   </div>
-                </button>
+                </Link>
               </div>
             </div>
           </motion.div>

@@ -30,7 +30,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2 group">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-blue-600 shadow-[0_0_15px_rgba(168,85,247,0.5)] group-hover:scale-110 transition-transform duration-300" />
-          <span className="text-xl font-display font-bold tracking-tight">NEON<span className="text-purple-400">LABS</span></span>
+          <span className="text-xl font-display font-bold tracking-tight">VIRUS<span className="text-purple-400">LABS</span></span>
         </Link>
 
         {/* Desktop Nav */}
