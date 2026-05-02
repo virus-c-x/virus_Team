@@ -33,6 +33,11 @@ service cloud.firestore {
       return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
     }
 
+    // --- Collection: Test Connection ---
+    match /test/{document=**} {
+      allow read: if true;
+    }
+
     // --- Collection: Site Content ---
     match /siteContent/{contentId} {
       allow read: if true; // Publicly readable for CMS

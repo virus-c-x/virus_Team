@@ -89,7 +89,7 @@ export default function Admin() {
       <div className="md:w-64 flex flex-col gap-8">
         <div className="glass-panel p-6 rounded-2xl">
           <div className="flex items-center gap-3 mb-8">
-             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-blue to-brand-purple flex items-center justify-center text-white font-bold">N</div>
+             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-blue to-brand-purple flex items-center justify-center text-white font-bold">V</div>
              <span className="font-display font-bold">Command Center</span>
           </div>
           

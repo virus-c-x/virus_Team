@@ -9,9 +9,9 @@ export default function Footer() {
           <div className="md:col-span-2">
             <Link to="/" className="flex items-center gap-2 mb-6 group">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-blue to-brand-purple flex items-center justify-center neon-glow-purple group-hover:scale-110 transition-transform duration-300">
-                <span className="text-white font-bold text-sm">N</span>
+                <span className="text-white font-bold text-sm">V</span>
               </div>
-              <span className="text-xl font-display font-bold tracking-tighter text-white">NEON</span>
+              <span className="text-xl font-display font-bold tracking-tighter text-white">VIRUS</span>
             </Link>
             <p className="text-white/50 max-w-sm text-sm leading-relaxed mb-8">
               Crafting premium digital experiences for forward-thinking brands. 
@@ -49,7 +49,7 @@ export default function Footer() {
 
         <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-white/30 truncate">
-            &copy; {new Date().getFullYear()} NEON Digital Experience. All rights reserved.
+            &copy; {new Date().getFullYear()} VIRUS Digital Experience. All rights reserved.
           </p>
           <div className="flex gap-8">
             <a href="#" className="text-xs text-white/30 hover:text-white transition-colors">Privacy Policy</a>
